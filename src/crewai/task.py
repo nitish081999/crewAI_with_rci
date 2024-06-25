@@ -117,7 +117,7 @@ class Task(BaseModel):
             self.thread.start()
             return "Async task started"
         else:
-            return self._execute(agent, context, tools)
+            return self._rci_chain()
 
     def _execute(self, agent: Agent, context: Optional[str], tools: Optional[List[Any]]) -> str:
         max_retries = 5
@@ -222,17 +222,17 @@ class Task(BaseModel):
     def __repr__(self):
         return f"Task(description={self.description}, expected_output={self.expected_output})"
 
-    def critique(self, output: str) -> bool:
+    def _critique(self, question,output: str) -> bool:
         """Critique the given output to determine if a more accurate answer is possible."""
         # Store the original description to restore later
         original_description = self.description
-
+        
         # Modify the description to ask for a more accurate answer
-        critique_question = f"Can you give a more accurate answer for this question based on the current answer? Answer yes or no.\nCurrent answer: {output}"
+        critique_question = f"Can you give a more accurate answer for this question :{question} ? based on the current answer \nCurrent answer: {output} ?  \nAnswer in yes or no."
         self.description = critique_question
 
         # Execute the task with the modified description
-        new_output = self.execute()
+        new_output = self._execute(self.agent,self.context,self.tools)
         
         # Log the critique question and new output
         print(f'Critique question: {critique_question}')
@@ -253,10 +253,11 @@ class Task(BaseModel):
             print("Can't find better result")
             return False
 
-    def rci_chain(self) -> str:
+    def _rci_chain(self) -> str:
         """Execute a recursive critique improvement chain."""
         # Initialize the final output
         final_output = None
+        question=self.description
 
         # Iterate for the specified number of iterations
         for itr in range(self.rci_iterations):
@@ -264,13 +265,13 @@ class Task(BaseModel):
             print(f'Starting iteration {itr + 1}/{self.rci_iterations}')
 
             # Execute the task and store the output
-            output = self.execute()
+            output = self._execute(self.agent, self.context, self.tools)
 
             # Print the output for this iteration
             print(f'Iteration {itr + 1} output: {output}')
 
             # Check if the critique function indicates that a better result is possible
-            if self.critique(output):
+            if self._critique(question,output):
                 print(f'Iteration {itr + 1}: Better result requested, continuing critique...\n')
                 continue
             else:
