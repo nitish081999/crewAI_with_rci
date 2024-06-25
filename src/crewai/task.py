@@ -228,7 +228,7 @@ class Task(BaseModel):
         original_description = self.description
         
         # Modify the description to ask for a more accurate answer
-        critique_question = f"Can you give a more accurate answer for this question :{question} ? based on the current answer \nCurrent answer: {output} ?  \nAnswer in yes or no."
+        critique_question = f"Can you give a more accurate answer for this question :{question} based on the current answer \nCurrent answer: {output} ?  \nStrictly answer in yes or no."
         self.description = critique_question
 
         # Execute the task with the modified description
@@ -268,18 +268,19 @@ class Task(BaseModel):
             output = self._execute(self.agent, self.context, self.tools)
 
             # Print the output for this iteration
-            print(f'Iteration {itr + 1} output: {output}')
+            print(f'Iteration {itr + 1} output:\n{output}')
 
             # Check if the critique function indicates that a better result is possible
             if self._critique(question,output):
-                print(f'Iteration {itr + 1}: Better result requested, continuing critique...\n')
+                answer_after_critique=self._execute(self.agent,self.description,self.tools)
+                print(f'Answer after critique :\n{answer_after_critique}')
+                final_output=answer_after_critique
                 continue
             else:
                 # Store the final output and exit the loop as no better result found
                 final_output = output
-                print(f'Iteration {itr + 1}: Accepted final output: {final_output}\n')
                 break
 
         # Log and return the final output
-        print(f'Final output after RCI chain: {final_output}')
+        print(f'Final output after RCI chain:\n{final_output}')
         return final_output
