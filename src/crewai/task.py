@@ -228,24 +228,18 @@ class Task(BaseModel):
         original_description = self.description
         
         # Modify the description to ask for a more accurate answer
-        critique_question = f"Can you give a more accurate answer for this question :{question} based on the current answer \nCurrent answer: {output} ?  \nStrictly answer in yes or no."
+        critique_question = f"Can you give a more accurate answer for this question :{question} based on the current answer \nCurrent answer: \n{output} ?  \nStrictly answer in yes or no."
         self.description = critique_question
 
         # Execute the task with the modified description
         new_output = self._execute(self.agent,self.context,self.tools)
         
         # Log the critique question and new output
-        print(f'Critique question: {critique_question}')
-        print(f'Critique response: {new_output}')
-
         # Check if the output indicates that a more accurate answer is possible
         if 'yes' in new_output.lower():
             # Modify the description to ask for an improved answer
-            improvement_prompt = f"Provide an improved answer for this question: {original_description}\nCurrent answer: {output}"
+            improvement_prompt = f"Provide an improved answer for this question: {question}\nCurrent answer: {output}"
             self.description = improvement_prompt
-            
-            # Log the improvement prompt
-            print(f'Improvement prompt: {improvement_prompt}')
             return True
         else:
             # Reset the description to its original value
@@ -274,6 +268,7 @@ class Task(BaseModel):
             if self._critique(question,output):
                 answer_after_critique=self._execute(self.agent,self.description,self.tools)
                 print(f'Answer after critique :\n{answer_after_critique}')
+                # For that case in which we got improved answer every time
                 final_output=answer_after_critique
                 continue
             else:
