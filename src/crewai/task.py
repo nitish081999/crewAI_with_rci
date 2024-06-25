@@ -243,7 +243,7 @@ class Task(BaseModel):
             return True
         else:
             # Reset the description to its original value
-            self.description = original_description
+            self.description = question
             print("Can't find better result")
             return False
 
