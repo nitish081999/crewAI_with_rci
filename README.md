@@ -88,7 +88,8 @@ researcher = Agent(
   allow_delegation=False,
   # You can pass an optional llm attribute specifying what model you wanna use.
   # llm=ChatOpenAI(model_name="gpt-3.5", temperature=0.7),
-  tools=[search_tool]
+  tools=[search_tool],
+  rci_iterations=5
 )
 writer = Agent(
   role='Tech Content Strategist',
@@ -96,7 +97,9 @@ writer = Agent(
   backstory="""You are a renowned Content Strategist, known for your insightful and engaging articles.
   You transform complex concepts into compelling narratives.""",
   verbose=True,
-  allow_delegation=True
+  allow_delegation=True,
+  rci_iterations=5
+
 )
 
 # Create tasks for your agents
