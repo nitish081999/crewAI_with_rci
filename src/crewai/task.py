@@ -234,7 +234,7 @@ class Task(BaseModel):
         # Execute the task with the modified description
         new_output = self._execute(self.agent,self.context,self.tools)
         
-        # Log the critique question and new output
+        
         # Check if the output indicates that a more accurate answer is possible
         if 'yes' in new_output.lower():
             # Modify the description to ask for an improved answer
