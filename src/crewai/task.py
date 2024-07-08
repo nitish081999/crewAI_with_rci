@@ -42,7 +42,7 @@ class Task(BaseModel):
     tools: Optional[List[Any]] = Field(default_factory=list, description="Tools available for task execution.")
     id: UUID4 = Field(default_factory=uuid.uuid4, frozen=True, description="Unique identifier for the task.")
     human_input: Optional[bool] = Field(default=False, description="Flag for human review.")
-    rci_iterations: int = Field(default=5, description='Number of iterations for RCI chain.')
+    rci_iterations: int = Field(default=2, description='Number of iterations for RCI chain.')
 
     _original_description: str | None = None
     _original_expected_output: str | None = None
